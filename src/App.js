@@ -4,6 +4,7 @@ import Home from './Home';
 import Portfolio from './Portfolio';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioHoldings from './PortfolioHoldings';
+import 'bootstrap/dist/css/bootstrap.min.css';
 // import PortfolioHome from './PortfolioHome';
 
 function App() {
