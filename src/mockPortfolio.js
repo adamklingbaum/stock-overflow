@@ -43,6 +43,7 @@ export const portfolio = {
       unrealizedGain: 1000,
       unrealizedPercent: 0.1081,
       trades: 2,
+      oneDay: 0.1256,
     },
     {
       securityId: 2,
@@ -56,6 +57,7 @@ export const portfolio = {
       unrealizedGain: 1000,
       unrealizedPercent: 0.1081,
       trades: 2,
+      oneDay: 0.1256,
     },
     {
       securityId: 3,
@@ -69,6 +71,7 @@ export const portfolio = {
       unrealizedGain: 1000,
       unrealizedPercent: 0.1081,
       trades: 2,
+      oneDay: 0.1256,
     },
   ],
 };

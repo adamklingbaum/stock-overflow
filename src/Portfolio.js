@@ -8,8 +8,10 @@ export default function Portfolio() {
   let pathname = useLocation().pathname.split('/').pop();
   console.log(pathname);
   return (
-    <div>
-      <h1>Portfolio {params.id}</h1>
+    <div className="my-3">
+      <div className="my-3">
+        <h2>Portfolio {params.id}</h2>
+      </div>
       <Nav variant="tabs">
         <Nav.Item>
           <Nav.Link active={pathname === 'overview'}>
