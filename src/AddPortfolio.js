@@ -1,9 +1,10 @@
-import { Button, Modal, Form } from 'react-bootstrap';
+import { Button, Modal, Form, InputGroup, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function AddPortfolio() {
   const [show, setShow] = useState(false);
+  const [tradeFields, setTradeFields] = useState(3);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -11,8 +12,9 @@ export default function AddPortfolio() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: '',
-    date: '',
+    name: null,
+    date: null,
+    cash: null,
   });
 
   const handleChange = (event) => {
@@ -28,24 +30,30 @@ export default function AddPortfolio() {
     navigate(`/portfolio/${portfolioId}/overview`);
   };
 
+  const addTradeField = () => {
+    const newTradeFields = tradeFields + 1;
+    setTradeFields(newTradeFields);
+  };
+
   return (
     <>
       <Button variant="primary" onClick={handleShow}>
         Add portfolio
       </Button>
 
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{formData.name || 'New portfolio'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
+        <Modal
+          show={show}
+          onHide={handleClose}
+          backdrop="static"
+          keyboard={false}
+          centered
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{formData.name || 'New portfolio'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <Form.Group className="mb-3" controlId="addPortfolio.name">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -65,16 +73,62 @@ export default function AddPortfolio() {
                 onChange={handleChange}
               />
             </Form.Group>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
+            <Form.Label htmlFor="addPortfolio.cash">
+              Starting cash balance
+            </Form.Label>
+            <InputGroup className="mb-3">
+              <InputGroup.Text>$</InputGroup.Text>
+              <Form.Control
+                type="number"
+                id="addPortfolio.cash"
+                name="cash"
+                min="0.01"
+                step="0.01"
+                size="sm"
+                value={formData.price}
+                onChange={handleChange}
+                placeholder="10,000.00"
+              />
+            </InputGroup>
+            <Form.Label>Transactions</Form.Label>
+            {[...Array(tradeFields).keys()].map((field) => (
+              <Row>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Control placeholder="Name" />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Text>#</InputGroup.Text>
+                    <Form.Control placeholder="Shares" />
+                  </InputGroup>
+                </Col>
+                <Col>
+                  <InputGroup classname="mb-3">
+                    <InputGroup.Text>$</InputGroup.Text>
+                    <Form.Control type="number" placeholder="Avg. price" />
+                  </InputGroup>
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
+                    <Form.Check inline type="radio" value="buy" label="Buy" />
+                    <Form.Check inline type="radio" value="sell" label="Sell" />
+                  </Form.Group>
+                </Col>
+              </Row>
+            ))}
+            <Button type="button" variant="secondary" onClick={addTradeField}>
+              Add trade
             </Button>
+          </Modal.Body>
+          <Modal.Footer>
             <Button variant="primary" type="submit">
               Create
             </Button>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer></Modal.Footer>
-      </Modal>
+          </Modal.Footer>
+        </Modal>
+      </Form>
     </>
   );
 }
