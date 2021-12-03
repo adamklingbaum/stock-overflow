@@ -5,13 +5,12 @@ import PortfolioHolding from './PortfolioHolding';
 
 export default function PortfolioHoldings() {
   const { holdings } = portfolio;
-  console.log(portfolio);
-  console.log(holdings);
+
   let params = useParams();
   return (
     <div className="my-3">
       <div className="my-3">
-        <h2>Portfolio {params.id} holdings</h2>
+        <h3>Portfolio {params.id} holdings</h3>
       </div>
       <div className="my-4">
         <Table responsive>
