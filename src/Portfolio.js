@@ -29,7 +29,6 @@ export default function Portfolio() {
         </Nav.Item>
       </Nav>
       <Routes>
-        <Route index element={<PortfolioOverview />} />
         <Route path="overview" element={<PortfolioOverview />} />
         <Route path="holdings" element={<PortfolioHoldings />} />
       </Routes>
