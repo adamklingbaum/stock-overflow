@@ -33,8 +33,15 @@ export const options = {
         },
       },
     },
+    x: {
+      grid: {
+        drawOnChartArea: false, // https://www.chartjs.org/docs/latest/samples/scale-options/grid.html
+      },
+    },
   },
 };
+
+// https://www.chartjs.org/docs/latest/axes/labelling.html
 
 ChartJS.register(
   CategoryScale,
@@ -54,11 +61,13 @@ export const data = {
     {
       label: 'Dataset 1',
       data: labels.map(() => faker.datatype.float({ min: -1, max: 2 })),
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13, 110, 253, 0.5)',
     },
   ],
 };
+
+// Look into time series scale
 
 export default function PortfolioSummary() {
   return (
