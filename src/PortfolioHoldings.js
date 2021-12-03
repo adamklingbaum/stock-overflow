@@ -18,13 +18,13 @@ export default function PortfolioHoldings() {
           <thead>
             <tr>
               <th>Company</th>
-              <th>Price</th>
-              <th>Shares</th>
-              <th>Market value</th>
-              <th>Average Cost</th>
-              <th>Total Cost</th>
-              <th>Unrealized Gain</th>
-              <th>Trades</th>
+              <th className="text-end">Price</th>
+              <th className="text-end">Shares</th>
+              <th className="text-end">Market value</th>
+              <th className="text-end">Average Cost</th>
+              <th className="text-end">Total Cost</th>
+              <th className="text-end">Unrealized Gain</th>
+              <th className="text-end">Trades</th>
             </tr>
           </thead>
           <tbody>
