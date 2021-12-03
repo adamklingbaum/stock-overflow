@@ -5,16 +5,23 @@ import Portfolio from './Portfolio';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioHoldings from './PortfolioHoldings';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Header from './Header';
+import { Container } from 'react-bootstrap';
 // import PortfolioHome from './PortfolioHome';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="portfolio/:id/*" element={<Portfolio />} />
-      </Routes>
-    </Router>
+    <>
+      <Header />
+      <Container>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="portfolio/:id/*" element={<Portfolio />} />
+          </Routes>
+        </Router>
+      </Container>
+    </>
   );
 }
 
