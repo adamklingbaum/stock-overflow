@@ -1,6 +1,7 @@
 import { Button, Modal, Form, InputGroup, Row, Col } from 'react-bootstrap';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { sp500 } from './sp500';
 
 export default function AddPortfolio() {
   const [show, setShow] = useState(false);
@@ -12,13 +13,13 @@ export default function AddPortfolio() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: null,
-    date: null,
-    cash: null,
+    name: '',
+    date: '',
+    cash: '',
     transactions: {
-      0: { type: 'buy' },
-      1: { type: 'buy' },
-      2: { type: 'buy' },
+      0: { name: '', shares: 1, price: 0.01, type: 'buy' },
+      1: { name: '', shares: 1, price: 0.01, type: 'buy' },
+      2: { name: '', shares: 1, price: 0.01, type: 'buy' },
     },
   });
 
@@ -36,15 +37,22 @@ export default function AddPortfolio() {
   };
 
   const addTradeField = () => {
+    const newFormData = { ...formData };
+    newFormData.transactions[tradeFields] = {
+      name: '',
+      shares: 1,
+      price: 0.01,
+      type: 'buy',
+    };
+    setFormData(newFormData);
     const newTradeFields = tradeFields + 1;
     setTradeFields(newTradeFields);
-    const newFormData = { ...formData };
-    newFormData.transactions[tradeFields] = {};
   };
 
-  const updateTransactionType = (event) => {
+  const updateTransaction = (event, key) => {
     const newFormData = { ...formData };
-    newFormData.transactions[event.target.name].type = event.target.value;
+    console.log(event.target.name, key);
+    newFormData.transactions[event.target.name][key] = event.target.value;
     console.log(newFormData);
     setFormData(newFormData);
   };
@@ -108,20 +116,62 @@ export default function AddPortfolio() {
             {[...Array(tradeFields).keys()].map((field) => (
               <Row>
                 <Col>
-                  <Form.Group className="mb-3">
-                    <Form.Control placeholder="Name" />
+                  <Form.Group className="mb-3" controlId="addPortfolio.name">
+                    <Form.Control
+                      size="sm"
+                      name={field}
+                      list="sp500DataList"
+                      placeholder="Name or symbol"
+                      value={formData.transactions[field].name}
+                      onChange={(e) => {
+                        updateTransaction(e, 'name');
+                      }}
+                    />
+                    <datalist id="sp500DataList">
+                      {sp500.map((co) => (
+                        <option value={co.Symbol} label={co.Name} />
+                      ))}
+                    </datalist>
                   </Form.Group>
+                  {/*  <Form.Group className="mb-3">
+                    <Form.Control
+                      placeholder="Name"
+                      name={field}
+                      value={formData.transactions[field].name}
+                      onChange={(e) => {
+                        updateTransaction(e, 'name');
+                      }}
+                    />
+                  </Form.Group> */}
                 </Col>
                 <Col>
                   <InputGroup className="mb-3">
                     <InputGroup.Text>#</InputGroup.Text>
-                    <Form.Control placeholder="Shares" />
+                    <Form.Control
+                      placeholder="Shares"
+                      type="number"
+                      name={field}
+                      value={formData.transactions[field].shares}
+                      onChange={(e) => {
+                        updateTransaction(e, 'shares');
+                      }}
+                    />
                   </InputGroup>
                 </Col>
                 <Col>
-                  <InputGroup classname="mb-3">
+                  <InputGroup className="mb-3">
                     <InputGroup.Text>$</InputGroup.Text>
-                    <Form.Control type="number" placeholder="Avg. price" />
+                    <Form.Control
+                      type="number"
+                      min="0.01"
+                      step="0.01"
+                      name={field}
+                      placeholder="Avg. price"
+                      value={formData.transactions[field].price}
+                      onChange={(e) => {
+                        updateTransaction(e, 'price');
+                      }}
+                    />
                   </InputGroup>
                 </Col>
                 <Col>
@@ -132,7 +182,9 @@ export default function AddPortfolio() {
                       value="buy"
                       label="Buy"
                       name={field}
-                      onChange={updateTransactionType}
+                      onChange={(e) => {
+                        updateTransaction(e, 'type');
+                      }}
                       checked={formData.transactions[field]?.type === 'buy'}
                     />
                     <Form.Check
@@ -141,7 +193,9 @@ export default function AddPortfolio() {
                       value="sell"
                       label="Sell"
                       name={field}
-                      onChange={updateTransactionType}
+                      onChange={(e) => {
+                        updateTransaction(e, 'type');
+                      }}
                       checked={formData.transactions[field]?.type === 'sell'}
                     />
                   </Form.Group>
