@@ -8,7 +8,7 @@ module.exports = {
     const queryParams = [type, securityId, shares, price, portfolioId];
     return db.query(queryString, queryParams);
   },
-  getAllByPortfolio: (portfolioId) => {
+  getAllByPortfolio: (portfolioId, date) => {
     const queryString = `
       SELECT
         stock_txs.id as id,
@@ -21,8 +21,9 @@ module.exports = {
         securities.symbol as symbol
       FROM stock_txs JOIN securities
       ON stock_txs.security_id=securities.id
-      WHERE portfolio_id=?`;
-    const queryParams = [portfolioId];
+      WHERE portfolio_id=?
+      ${date ? 'AND stock_txs.date <?' : ''}`;
+    const queryParams = [portfolioId, date];
     return db.query(queryString, queryParams);
   },
 };

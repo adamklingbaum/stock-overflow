@@ -3,9 +3,12 @@ const axios = require('axios');
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
 const { API_KEY } = require('../finnhub.config');
 
-const getHoldings = async (portfolioId) => {
+const getHoldings = async (portfolioId, date) => {
   try {
-    const [rows, fields] = await transaction.getAllByPortfolio(portfolioId);
+    const [rows, fields] = await transaction.getAllByPortfolio(
+      portfolioId,
+      date,
+    );
     let holdings = {};
     rows.forEach(
       ({ id, date, type, units, price, securityId, name, symbol }) => {
@@ -57,6 +60,57 @@ const getHoldings = async (portfolioId) => {
   }
 };
 
+const getSummary = async (portfolioId, date) => {
+  try {
+    const holdings = await getHoldings(portfolioId, date);
+    const portfolioSummary = {};
+    portfolioSummary.numHoldings = holdings.length;
+    portfolioSummary.top3Holdings = holdings
+      .sort((a, b) => b.mktVal - a.mktVal)
+      .slice(0, 3);
+    portfolioSummary.bookCost = holdings.reduce(
+      (prev, curr) => prev + curr.totalCost,
+      0,
+    );
+
+    // Calculate cash
+    let [rows, fields] = await portfolio.getStartingCash(portfolioId);
+    const startingCash = rows[0]['starting_cash'];
+    [rows, fields] = await transaction.getAllByPortfolio(portfolioId, date);
+    portfolioSummary.cash = rows.reduce((prev, tx) => {
+      if (tx.type === 'sell') return prev + tx.units * tx.price;
+      else return prev - tx.units * tx.price;
+    }, startingCash);
+
+    // Calculate investments
+    portfolioSummary.investments = holdings.reduce(
+      (prev, holding) => prev + holding.mktVal,
+      0,
+    );
+
+    // Calculate market value
+    portfolioSummary.totalMktVal =
+      portfolioSummary.cash + portfolioSummary.investments;
+
+    // Calculate return since inception
+    portfolioSummary.returnSinceInception =
+      portfolioSummary.totalMktVal - startingCash;
+
+    // Calculate percent since inception
+    portfolioSummary.percentSinceInception =
+      portfolioSummary.returnSinceInception / startingCash;
+
+    // Calculate unrealizedGains
+    portfolioSummary.unrealizedGains =
+      portfolioSummary.investments - portfolioSummary.bookCost;
+
+    return portfolioSummary;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
 module.exports = {
   create: async (req, res) => {
     const { name, date, cash } = req.body;
@@ -82,51 +136,34 @@ module.exports = {
   getSummary: async (req, res) => {
     const { portfolio_id: portfolioId } = req.params;
     try {
-      const holdings = await getHoldings(portfolioId);
-      const portfolioSummary = {};
-      portfolioSummary.numHoldings = holdings.length;
-      portfolioSummary.top3Holdings = holdings
-        .sort((a, b) => b.mktVal - a.mktVal)
-        .slice(0, 3);
-      portfolioSummary.bookCost = holdings.reduce(
-        (prev, curr) => prev + curr.totalCost,
-        0,
-      );
-
-      // Calculate cash
-      let [rows, fields] = await portfolio.getStartingCash(portfolioId);
-      const startingCash = rows[0]['starting_cash'];
-      [rows, fields] = await transaction.getAllByPortfolio(portfolioId);
-      portfolioSummary.cash = rows.reduce((prev, tx) => {
-        if (tx.type === 'sell') return prev + tx.units * tx.price;
-        else return prev - tx.units * tx.price;
-      }, startingCash);
-
-      // Calculate investments
-      portfolioSummary.investments = holdings.reduce(
-        (prev, holding) => prev + holding.mktVal,
-        0,
-      );
-
-      // Calculate market value
-      portfolioSummary.totalMktVal =
-        portfolioSummary.cash + portfolioSummary.investments;
-
-      // Calculate return since inception
-      portfolioSummary.returnSinceInception =
-        portfolioSummary.totalMktVal - startingCash;
-
-      // Calculate percent since inception
-      portfolioSummary.percentSinceInception =
-        portfolioSummary.returnSinceInception / startingCash;
-
-      // Calculate unrealizedGains
-      portfolioSummary.unrealizedGains =
-        portfolioSummary.investments - portfolioSummary.bookCost;
-      res.status(200).send(portfolioSummary);
+      const summary = await getSummary(portfolioId);
+      res.status(200).send(summary);
     } catch (e) {
       console.error(e);
       res.status(500).send();
     }
+  },
+  getDailyValues: async (req, res) => {
+    const { portfolio_id: portfolioId } = req.params;
+    console.log(portfolioId);
+    let [rows, fields] = await portfolio.get(portfolioId);
+    const p = rows[0];
+    const { inception_date: inceptionDate, starting_cash: startingCash } = p;
+    console.log(inceptionDate, startingCash);
+
+    const today = new Date();
+    let start = new Date(inceptionDate);
+    let currDate = start;
+    const series = {};
+    while (currDate <= today) {
+      const currString = currDate.toISOString().split('T')[0];
+      const nextDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+      const nextString = nextDate.toISOString().split('T')[0];
+      series[currString] = { date: currDate };
+      const portfolioSummary = await getSummary(portfolioId, nextString);
+      series[currString].summary = portfolioSummary;
+      currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+    }
+    console.log(series);
   },
 };
