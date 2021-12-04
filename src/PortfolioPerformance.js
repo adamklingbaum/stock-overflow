@@ -29,11 +29,15 @@ export const options = {
   },
   scales: {
     y: {
+      /* max: 1,
+      min: -1, */
       ticks: {
         callback: function (value) {
-          return 100 * value + '%';
+          return Math.round(value * 100) + '%';
         },
+        stepSize: 0.05,
       },
+      grace: '0.05',
     },
     x: {
       grid: {
@@ -42,7 +46,7 @@ export const options = {
       ticks: {
         maxRotation: 0,
         includeBounds: true,
-        maxTicksLimit: 5,
+        // maxTicksLimit: 10,
       },
     },
   },
@@ -94,7 +98,7 @@ export default function PortfolioSummary() {
     labels,
     datasets: [
       {
-        label: 'Dataset 1',
+        label: 'Return',
         data: labels.map(
           (label) => series[label]?.summary.percentSinceInception,
         ),

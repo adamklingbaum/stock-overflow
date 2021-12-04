@@ -1,11 +1,11 @@
 const db = require('../db');
 
 module.exports = {
-  create: ({ type, securityId, shares, price, portfolioId }) => {
+  create: ({ type, securityId, shares, price, portfolioId, date }) => {
     const queryString = `
-      INSERT INTO stock_txs (type, security_id, units, price, portfolio_id)
-      VALUES (?, ?, ?, ?, ?)`;
-    const queryParams = [type, securityId, shares, price, portfolioId];
+      INSERT INTO stock_txs (type, security_id, units, price, portfolio_id, date)
+      VALUES (?, ?, ?, ?, ?, ?)`;
+    const queryParams = [type, securityId, shares, price, portfolioId, date];
     return db.query(queryString, queryParams);
   },
   getAllByPortfolio: (portfolioId, date) => {

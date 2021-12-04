@@ -163,7 +163,7 @@ module.exports = {
         series[currString] = { date: currDate };
         const portfolioSummary = await getSummary(portfolioId, nextString);
         series[currString].summary = portfolioSummary;
-        currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+        currDate = new Date(currDate.getTime() + 10000 * 60 * 60 * 24);
       }
       console.log(series);
       res.status(200).send(series);

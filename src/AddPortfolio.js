@@ -25,9 +25,9 @@ export default function AddPortfolio() {
     date: '',
     cash: '',
     transactions: [
-      { symbol: '', shares: '', price: '', type: 'buy' },
-      { symbol: '', shares: '', price: '', type: 'buy' },
-      { symbol: '', shares: '', price: '', type: 'buy' },
+      { symbol: '', date: '', shares: '', price: '', type: 'buy' },
+      { symbol: '', date: '', shares: '', price: '', type: 'buy' },
+      { symbol: '', date: '', shares: '', price: '', type: 'buy' },
     ],
   });
 
@@ -48,13 +48,14 @@ export default function AddPortfolio() {
         console.log('data back from post portfolios', data);
         portfolioId = data['created_id'];
         const promises = formData.transactions.map(
-          ({ symbol, shares, price, type }) =>
+          ({ symbol, shares, price, type, date }) =>
             axios.post('/transactions', {
               portfolioId,
               symbol,
               shares,
               price,
               type,
+              date,
             }),
         );
         return Promise.all(promises);
@@ -72,6 +73,7 @@ export default function AddPortfolio() {
       symbol: '',
       shares: '',
       price: '',
+      date: '',
       type: 'buy',
     });
     setFormData(newFormData);
@@ -99,7 +101,7 @@ export default function AddPortfolio() {
         backdrop="static"
         keyboard={false}
         centered
-        size="lg"
+        size="xl"
       >
         <Modal.Header closeButton>
           <Modal.Title>{formData.name || 'New portfolio'}</Modal.Title>
@@ -148,7 +150,6 @@ export default function AddPortfolio() {
                 <Col>
                   <Form.Group className="mb-3" controlId="addPortfolio.name">
                     <Form.Control
-                      size="sm"
                       name={index}
                       list="sp500DataList"
                       placeholder="Name or symbol"
@@ -163,16 +164,19 @@ export default function AddPortfolio() {
                       ))}
                     </datalist>
                   </Form.Group>
-                  {/*  <Form.Group className="mb-3">
+                </Col>
+                <Col>
+                  <Form.Group className="mb-3">
                     <Form.Control
-                      placeholder="Name"
+                      placeholder="Date"
+                      type="date"
                       name={index}
-                      value={formData.transactions[index].name}
+                      value={formData.transactions[index].date}
                       onChange={(e) => {
-                        updateTransaction(e, 'name');
+                        updateTransaction(e, 'date');
                       }}
                     />
-                  </Form.Group> */}
+                  </Form.Group>
                 </Col>
                 <Col>
                   <InputGroup className="mb-3">
