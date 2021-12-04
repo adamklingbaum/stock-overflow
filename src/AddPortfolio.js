@@ -1,10 +1,12 @@
 import { Button, Modal, Form, InputGroup, Row, Col } from 'react-bootstrap';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { sp500 } from './sp500';
+import axios from 'axios';
 
 export default function AddPortfolio() {
   const [show, setShow] = useState(false);
+  const [universe, setUniverse] = useState([]);
   const [tradeFields, setTradeFields] = useState(3);
 
   const handleClose = () => setShow(false);
@@ -12,15 +14,21 @@ export default function AddPortfolio() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    axios.get('/securities').then(({ data }) => {
+      setUniverse(data);
+    });
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     date: '',
     cash: '',
-    transactions: {
-      0: { name: '', shares: 1, price: 0.01, type: 'buy' },
-      1: { name: '', shares: 1, price: 0.01, type: 'buy' },
-      2: { name: '', shares: 1, price: 0.01, type: 'buy' },
-    },
+    transactions: [
+      { symbol: '', shares: '', price: '', type: 'buy' },
+      { symbol: '', shares: '', price: '', type: 'buy' },
+      { symbol: '', shares: '', price: '', type: 'buy' },
+    ],
   });
 
   const handleChange = (event) => {
@@ -32,19 +40,40 @@ export default function AddPortfolio() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const portfolioId = 4; // mock data would be the id returned by the api
-    navigate(`/portfolio/${portfolioId}/overview`);
-    console.log('yes');
+    const { name, date, cash } = formData;
+    let portfolioId;
+    axios
+      .post('/portfolios', { name, date, cash })
+      .then(({ data }) => {
+        console.log('data back from post portfolios', data);
+        portfolioId = data['created_id'];
+        const promises = formData.transactions.map(
+          ({ symbol, shares, price, type }) =>
+            axios.post('/transactions', {
+              portfolioId,
+              symbol,
+              shares,
+              price,
+              type,
+            }),
+        );
+        return Promise.all(promises);
+      })
+      .then((responses) => {
+        console.log(responses);
+        navigate(`/portfolio/${portfolioId}/overview`);
+      })
+      .catch((error) => console.log(error));
   };
 
   const addTradeField = () => {
     const newFormData = { ...formData };
-    newFormData.transactions[tradeFields] = {
-      name: '',
-      shares: 1,
-      price: 0.01,
+    newFormData.transactions.push({
+      symbol: '',
+      shares: '',
+      price: '',
       type: 'buy',
-    };
+    });
     setFormData(newFormData);
     const newTradeFields = tradeFields + 1;
     setTradeFields(newTradeFields);
@@ -114,31 +143,31 @@ export default function AddPortfolio() {
               />
             </InputGroup>
             <Form.Label>Transactions</Form.Label>
-            {[...Array(tradeFields).keys()].map((field) => (
+            {[...Array(tradeFields)].map((field, index) => (
               <Row>
                 <Col>
                   <Form.Group className="mb-3" controlId="addPortfolio.name">
                     <Form.Control
                       size="sm"
-                      name={field}
+                      name={index}
                       list="sp500DataList"
                       placeholder="Name or symbol"
-                      value={formData.transactions[field].name}
+                      value={formData.transactions[index].symbol}
                       onChange={(e) => {
-                        updateTransaction(e, 'name');
+                        updateTransaction(e, 'symbol');
                       }}
                     />
                     <datalist id="sp500DataList">
-                      {sp500.map((co) => (
-                        <option value={co.Symbol} label={co.Name} />
+                      {universe.map((co) => (
+                        <option value={co.symbol} label={co.name} />
                       ))}
                     </datalist>
                   </Form.Group>
                   {/*  <Form.Group className="mb-3">
                     <Form.Control
                       placeholder="Name"
-                      name={field}
-                      value={formData.transactions[field].name}
+                      name={index}
+                      value={formData.transactions[index].name}
                       onChange={(e) => {
                         updateTransaction(e, 'name');
                       }}
@@ -151,8 +180,8 @@ export default function AddPortfolio() {
                     <Form.Control
                       placeholder="Shares"
                       type="number"
-                      name={field}
-                      value={formData.transactions[field].shares}
+                      name={index}
+                      value={formData.transactions[index].shares}
                       onChange={(e) => {
                         updateTransaction(e, 'shares');
                       }}
@@ -166,9 +195,9 @@ export default function AddPortfolio() {
                       type="number"
                       min="0.01"
                       step="0.01"
-                      name={field}
+                      name={index}
                       placeholder="Avg. price"
-                      value={formData.transactions[field].price}
+                      value={formData.transactions[index].price}
                       onChange={(e) => {
                         updateTransaction(e, 'price');
                       }}
@@ -182,22 +211,22 @@ export default function AddPortfolio() {
                       type="radio"
                       value="buy"
                       label="Buy"
-                      name={field}
+                      name={index}
                       onChange={(e) => {
                         updateTransaction(e, 'type');
                       }}
-                      checked={formData.transactions[field]?.type === 'buy'}
+                      checked={formData.transactions[index].type === 'buy'}
                     />
                     <Form.Check
                       inline
                       type="radio"
                       value="sell"
                       label="Sell"
-                      name={field}
+                      name={index}
                       onChange={(e) => {
                         updateTransaction(e, 'type');
                       }}
-                      checked={formData.transactions[field]?.type === 'sell'}
+                      checked={formData.transactions[index].type === 'sell'}
                     />
                   </Form.Group>
                 </Col>
