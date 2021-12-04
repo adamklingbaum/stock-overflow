@@ -196,7 +196,7 @@ export default function AddPortfolio() {
                       min="0.01"
                       step="0.01"
                       name={index}
-                      placeholder="Avg. price"
+                      placeholder="Price"
                       value={formData.transactions[index].price}
                       onChange={(e) => {
                         updateTransaction(e, 'price');

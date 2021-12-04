@@ -14,6 +14,8 @@ app.get('/sports', (req, res) => {
 
 app.get('/securities', security.getAll);
 
+app.get('/portfolios/:portfolio_id/summary', portfolio.getSummary);
+
 app.get('/portfolios/:portfolio_id/holdings', portfolio.getHoldings);
 app.post('/portfolios', portfolio.create);
 
