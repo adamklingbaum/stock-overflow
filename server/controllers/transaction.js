@@ -13,7 +13,7 @@ module.exports = {
         price,
         portfolioId,
       });
-      res.status(201).send(results[0]);
+      res.status(201).send(results);
     } catch (e) {
       console.error(e);
       res.status(500).send();

@@ -108,9 +108,3 @@ FIELDS TERMINATED BY ','
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (@col1, @col2, @col3) set name=@col2,symbol=@col1,sector=@col3;
-
-INSERT INTO `portfolios` (name, starting_cash)
-VALUES ('yolofolio', 1000000);
-
-INSERT INTO `stock_txs` (type, security_id, units, price, portfolio_id)
-VALUES ('buy', 1, 100, 34.50, 1), ('sell', 1, -50, 46.00, 1);
