@@ -10,6 +10,10 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import faker from 'faker';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 
 export const options = {
   responsive: true,
@@ -35,6 +39,11 @@ export const options = {
       grid: {
         drawOnChartArea: false, // https://www.chartjs.org/docs/latest/samples/scale-options/grid.html
       },
+      ticks: {
+        maxRotation: 0,
+        includeBounds: true,
+        maxTicksLimit: 5,
+      },
     },
   },
 };
@@ -51,9 +60,7 @@ ChartJS.register(
   Legend,
 );
 
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-export const data = {
+/* export const data = {
   labels,
   datasets: [
     {
@@ -63,15 +70,50 @@ export const data = {
       backgroundColor: 'rgba(13, 110, 253, 0.5)',
     },
   ],
-};
+}; */
 
 // Look into time series scale
 
 export default function PortfolioSummary() {
+  let { id } = useParams();
+
+  const [labels, setLabels] = useState([]);
+  const [series, setSeries] = useState({});
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    axios.get(`/portfolios/${id}/daily`).then(({ data }) => {
+      setLabels(Object.keys(data));
+      setSeries(data);
+      setShow(true);
+      console.log(data);
+    });
+  }, []);
+
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Dataset 1',
+        data: labels.map(
+          (label) => series[label]?.summary.percentSinceInception,
+        ),
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.5)',
+      },
+    ],
+  };
+
   return (
     <div className="py-3">
       <h4>Performance since inception</h4>
-      <Line options={options} data={data} />
+      {show ? (
+        <Line options={options} data={data} />
+      ) : (
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      )}
     </div>
   );
 }

@@ -146,24 +146,29 @@ module.exports = {
   getDailyValues: async (req, res) => {
     const { portfolio_id: portfolioId } = req.params;
     console.log(portfolioId);
-    let [rows, fields] = await portfolio.get(portfolioId);
-    const p = rows[0];
-    const { inception_date: inceptionDate, starting_cash: startingCash } = p;
-    console.log(inceptionDate, startingCash);
+    try {
+      let [rows, fields] = await portfolio.get(portfolioId);
+      const p = rows[0];
+      const { inception_date: inceptionDate, starting_cash: startingCash } = p;
+      console.log(inceptionDate, startingCash);
 
-    const today = new Date();
-    let start = new Date(inceptionDate);
-    let currDate = start;
-    const series = {};
-    while (currDate <= today) {
-      const currString = currDate.toISOString().split('T')[0];
-      const nextDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
-      const nextString = nextDate.toISOString().split('T')[0];
-      series[currString] = { date: currDate };
-      const portfolioSummary = await getSummary(portfolioId, nextString);
-      series[currString].summary = portfolioSummary;
-      currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+      const today = new Date();
+      let start = new Date(inceptionDate);
+      let currDate = start;
+      const series = {};
+      while (currDate <= today) {
+        const currString = currDate.toISOString().split('T')[0];
+        const nextDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+        const nextString = nextDate.toISOString().split('T')[0];
+        series[currString] = { date: currDate };
+        const portfolioSummary = await getSummary(portfolioId, nextString);
+        series[currString].summary = portfolioSummary;
+        currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
+      }
+      console.log(series);
+      res.status(200).send(series);
+    } catch (e) {
+      console.error(e);
     }
-    console.log(series);
   },
 };
