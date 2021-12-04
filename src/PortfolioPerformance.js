@@ -1,5 +1,3 @@
-import { toCurrency, toPercent, toNumber, getTextColor } from './utils';
-import { Row, Col, Table } from 'react-bootstrap';
 import {
   Chart as ChartJS,
   CategoryScale,

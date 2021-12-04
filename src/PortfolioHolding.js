@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap';
-import { toCurrency, toPercent, toNumber, getTextColor } from './utils';
+import { toCurrency, toPercent, toNumber } from './utils';
 
 export default function PortfolioHolding({ holding }) {
   const {
@@ -25,7 +25,7 @@ export default function PortfolioHolding({ holding }) {
         <div>{toCurrency(price)}</div>
         <small>{toPercent(oneDay)}</small>
       </td>
-      <td className="text-end">{toNumber(100)}</td>
+      <td className="text-end">{toNumber(shares)}</td>
       <td className="text-end">{toCurrency(mktVal)}</td>
       <td className="text-end">{toCurrency(avgCost)}</td>
       <td className="text-end">{toCurrency(totalCost)}</td>

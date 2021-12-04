@@ -34,6 +34,7 @@ export default function AddPortfolio() {
     event.preventDefault();
     const portfolioId = 4; // mock data would be the id returned by the api
     navigate(`/portfolio/${portfolioId}/overview`);
+    console.log('yes');
   };
 
   const addTradeField = () => {
@@ -63,19 +64,19 @@ export default function AddPortfolio() {
         Add portfolio
       </Button>
 
-      <Form onSubmit={handleSubmit}>
-        <Modal
-          show={show}
-          onHide={handleClose}
-          backdrop="static"
-          keyboard={false}
-          centered
-          size="lg"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>{formData.name || 'New portfolio'}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        centered
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{formData.name || 'New portfolio'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="addPortfolio.name">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -202,17 +203,32 @@ export default function AddPortfolio() {
                 </Col>
               </Row>
             ))}
-            <Button type="button" variant="secondary" onClick={addTradeField}>
-              Add trade
-            </Button>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" type="submit">
-              Create
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </Form>
+            <div className="mb-3">
+              <Button type="button" variant="secondary" onClick={addTradeField}>
+                Add trade
+              </Button>
+              <Button
+                variant="primary"
+                type="submit"
+                style={{ display: 'none' }}
+                id="btnSubmitPortfolio"
+              >
+                Create
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            type="button"
+            onClick={() =>
+              document.getElementById('btnSubmitPortfolio').click()
+            }
+          >
+            Create
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

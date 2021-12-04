@@ -1,5 +1,5 @@
-import { Routes, Route, useParams } from 'react-router-dom';
-import { Row, Col, Table } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { Row, Col } from 'react-bootstrap';
 
 import PortfolioSummary from './PortfolioSummary';
 import PortfolioPerformance from './PortfolioPerformance';

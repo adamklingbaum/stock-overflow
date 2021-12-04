@@ -1,5 +1,5 @@
-import { Routes, Route, useParams } from 'react-router-dom';
-import { Row, Table } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
 import { portfolio } from './mockPortfolio';
 import PortfolioHolding from './PortfolioHolding';
 

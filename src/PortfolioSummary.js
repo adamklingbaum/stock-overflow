@@ -1,12 +1,9 @@
-import { toCurrency, toPercent, toNumber, getTextColor } from './utils';
-import { Row, Col, Table } from 'react-bootstrap';
+import { toCurrency, toPercent } from './utils';
+import { Table } from 'react-bootstrap';
 import { portfolio } from './mockPortfolio';
 
 export default function PortfolioSummary() {
   const {
-    id,
-    inceptionDate,
-    name,
     cash,
     investments,
     totalMktVal,
