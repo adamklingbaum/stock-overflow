@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Table } from 'react-bootstrap';
+import { Table, Spinner } from 'react-bootstrap';
 import { portfolio } from './mockPortfolio';
 import PortfolioHolding from './PortfolioHolding';
 import { useEffect, useState } from 'react';
@@ -23,7 +23,7 @@ export default function PortfolioHoldings() {
         <h3>Portfolio {params.id} holdings</h3>
       </div>
       <div className="my-4">
-        {show && (
+        {show ? (
           <Table responsive>
             <thead>
               <tr>
@@ -43,6 +43,10 @@ export default function PortfolioHoldings() {
               ))}
             </tbody>
           </Table>
+        ) : (
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading</span>
+          </Spinner>
         )}
       </div>
     </div>

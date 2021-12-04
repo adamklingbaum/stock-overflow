@@ -1,4 +1,7 @@
 const { portfolio, transaction } = require('../models');
+const axios = require('axios');
+const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
+const { API_KEY } = require('../finnhub.config');
 
 module.exports = {
   create: async (req, res) => {
@@ -17,7 +20,7 @@ module.exports = {
     try {
       const [rows, fields] = await transaction.getAllByPortfolio(portfolioId);
       console.log(rows);
-      const holdings = {};
+      let holdings = {};
       rows.forEach(
         ({ id, date, type, units, price, securityId, name, symbol }) => {
           if (!(securityId in holdings)) {
@@ -38,18 +41,30 @@ module.exports = {
           holding.trades += 1;
         },
       );
-      Object.keys(holdings).forEach((key) => {
-        const holding = holdings[key];
-        holding.price = 504.23;
-        holding.oneDay = 0.1234;
-        holding.mktVal = holding.price * holding.shares;
-        holding.avgCost =
-          holding.totalPurchaseCost / holding.totalPurchaseUnits;
-        holding.totalCost = holding.avgCost * holding.shares;
-        holding.unrealizedGain = holding.mktVal - holding.totalCost;
-        holding.unrealizedPercent = holding.unrealizedGain / holding.totalCost;
-      });
-      res.status(200).send(holdings);
+
+      holdings = Object.keys(holdings).map(
+        (key) =>
+          new Promise((resolve, reject) => {
+            const holding = holdings[key];
+            axios
+              .get(`${FINNHUB_BASE_URL}/quote?symbol=${holding.symbol}`, {
+                headers: { 'X-FinnHub-Token': API_KEY },
+              })
+              .then(({ data }) => {
+                holding.price = data.c;
+                holding.oneDay = data.dp / 100;
+                holding.mktVal = holding.price * holding.shares;
+                holding.avgCost =
+                  holding.totalPurchaseCost / holding.totalPurchaseUnits;
+                holding.totalCost = holding.avgCost * holding.shares;
+                holding.unrealizedGain = holding.mktVal - holding.totalCost;
+                holding.unrealizedPercent =
+                  holding.unrealizedGain / holding.totalCost;
+                resolve(holding);
+              });
+          }),
+      );
+      Promise.all(holdings).then((holdings) => res.status(200).send(holdings));
     } catch (e) {
       console.error(e);
       res.status(500).send();
