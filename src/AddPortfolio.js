@@ -15,6 +15,11 @@ export default function AddPortfolio() {
     name: null,
     date: null,
     cash: null,
+    transactions: {
+      0: { type: 'buy' },
+      1: { type: 'buy' },
+      2: { type: 'buy' },
+    },
   });
 
   const handleChange = (event) => {
@@ -33,6 +38,15 @@ export default function AddPortfolio() {
   const addTradeField = () => {
     const newTradeFields = tradeFields + 1;
     setTradeFields(newTradeFields);
+    const newFormData = { ...formData };
+    newFormData.transactions[tradeFields] = {};
+  };
+
+  const updateTransactionType = (event) => {
+    const newFormData = { ...formData };
+    newFormData.transactions[event.target.name].type = event.target.value;
+    console.log(newFormData);
+    setFormData(newFormData);
   };
 
   return (
@@ -112,8 +126,24 @@ export default function AddPortfolio() {
                 </Col>
                 <Col>
                   <Form.Group className="mb-3">
-                    <Form.Check inline type="radio" value="buy" label="Buy" />
-                    <Form.Check inline type="radio" value="sell" label="Sell" />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      value="buy"
+                      label="Buy"
+                      name={field}
+                      onChange={updateTransactionType}
+                      checked={formData.transactions[field]?.type === 'buy'}
+                    />
+                    <Form.Check
+                      inline
+                      type="radio"
+                      value="sell"
+                      label="Sell"
+                      name={field}
+                      onChange={updateTransactionType}
+                      checked={formData.transactions[field]?.type === 'sell'}
+                    />
                   </Form.Group>
                 </Col>
               </Row>
