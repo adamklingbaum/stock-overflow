@@ -6,10 +6,13 @@ export default function Header() {
       <Container>
         <Navbar.Brand href="/">Stock Overflow</Navbar.Brand>
         <Nav className="me-auto">
-          <Nav.Link>Link 1</Nav.Link>
-          <Nav.Link>Link 2</Nav.Link>
-          <Nav.Link>Link 3</Nav.Link>
+          <Nav.Link>My portfolios</Nav.Link>
+          <Nav.Link>Stock lookup</Nav.Link>
+          <Nav.Link>News</Nav.Link>
         </Nav>
+        <Navbar.Text>
+          Signed in as: <a href="#login">Adam Klingbaum</a>
+        </Navbar.Text>
       </Container>
     </Navbar>
   );
