@@ -9,10 +9,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import faker from 'faker';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 
 export const options = {
@@ -62,35 +60,19 @@ ChartJS.register(
   Legend,
 );
 
-/* export const data = {
-  labels,
-  datasets: [
-    {
-      label: 'Dataset 1',
-      data: labels.map(() => faker.datatype.float({ min: -1, max: 2 })),
-      borderColor: '#0d6efd',
-      backgroundColor: 'rgba(13, 110, 253, 0.5)',
-    },
-  ],
-}; */
-
-// Look into time series scale
-
-export default function PortfolioSummary() {
-  let { id } = useParams();
-
+export default function PortfolioSummary({ portfolio }) {
   const [labels, setLabels] = useState([]);
   const [series, setSeries] = useState({});
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    axios.get(`/portfolios/${id}/daily`).then(({ data }) => {
+    axios.get(`/portfolios/${portfolio.id}/daily`).then(({ data }) => {
       setLabels(Object.keys(data));
       setSeries(data);
       setShow(true);
       console.log(data);
     });
-  }, []);
+  }, [portfolio.id]);
 
   const data = {
     labels,

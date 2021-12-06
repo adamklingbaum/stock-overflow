@@ -3,22 +3,19 @@ import { Row, Col } from 'react-bootstrap';
 
 import PortfolioSummary from './PortfolioSummary';
 import PortfolioPerformance from './PortfolioPerformance';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
-export default function PortfolioOverview() {
-  let params = useParams();
-
+export default function PortfolioOverview({ portfolio }) {
   return (
     <div className="my-3">
-      <div className="my-3">
-        <h3>Portfolio {params.id} overview</h3>
-      </div>
       <div className="my-4">
         <Row>
           <Col xs={8}>
-            <PortfolioPerformance />
+            <PortfolioPerformance portfolio={portfolio} />
           </Col>
           <Col xs={4} className="border rounded bg-light shadow-sm">
-            <PortfolioSummary />
+            <PortfolioSummary portfolio={portfolio} />
           </Col>
         </Row>
       </div>

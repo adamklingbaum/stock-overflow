@@ -14,6 +14,7 @@ app.get('/sports', (req, res) => {
 
 app.get('/securities', security.getAll);
 
+app.get('/portfolios/:portfolio_id', portfolio.get);
 app.get('/portfolios/:portfolio_id/summary', portfolio.getSummary);
 app.get('/portfolios/:portfolio_id/daily', portfolio.getDailyValues);
 

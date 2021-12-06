@@ -4,20 +4,17 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './PortfolioSummary.css';
-// import { portfolio } from './mockPortfolio';
 
-export default function PortfolioSummary() {
-  let { id: portfolioId } = useParams();
-  const [portfolio, setPortfolio] = useState([]);
-
+export default function PortfolioSummary({ portfolio }) {
+  const [data, setData] = useState({});
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    axios.get(`/portfolios/${portfolioId}/summary`).then(({ data }) => {
-      setPortfolio(data);
+    axios.get(`/portfolios/${portfolio.id}/summary`).then(({ data }) => {
+      setData(data);
       setShow(true);
     });
-  }, [portfolioId]);
+  }, [portfolio.id]);
 
   return (
     <div className="px-3 py-3">
@@ -27,16 +24,16 @@ export default function PortfolioSummary() {
           <Table borderless responsive>
             <tr>
               <td>Cash</td>
-              <td className="text-end">{toCurrency(portfolio.cash)}</td>
+              <td className="text-end">{toCurrency(data.cash)}</td>
             </tr>
             <tr>
               <td>Investments</td>
-              <td className="text-end">{toCurrency(portfolio.investments)}</td>
+              <td className="text-end">{toCurrency(data.investments)}</td>
             </tr>
             <tr>
               <td className="fw-bold">Total market value</td>
               <td className="text-end fw-bold">
-                {toCurrency(portfolio.totalMktVal)}
+                {toCurrency(data.totalMktVal)}
               </td>
             </tr>
             <tr>
@@ -46,10 +43,10 @@ export default function PortfolioSummary() {
               <td className="fw-bold">Total return</td>
               <td
                 className={`text-end fw-bold ${getTextColor(
-                  portfolio.returnSinceInception,
+                  data.returnSinceInception,
                 )}`}
               >
-                {toCurrency(portfolio.returnSinceInception)}
+                {toCurrency(data.returnSinceInception)}
               </td>
             </tr>
             <tr>
@@ -58,44 +55,29 @@ export default function PortfolioSummary() {
               </td>
               <td
                 className={`text-end ${getTextColor(
-                  portfolio.percentSinceInception,
+                  data.percentSinceInception,
                 )}`}
               >
                 <small>{`${
-                  portfolio.percentSinceInception > 0 ? '+' : ''
-                }${toPercent(portfolio.percentSinceInception)}`}</small>
+                  data.percentSinceInception > 0 ? '+' : ''
+                }${toPercent(data.percentSinceInception)}`}</small>
               </td>
             </tr>
             <tr>
               <br />
             </tr>
-            {/* <tr>
-              <td>Total return</td>
-              <td className="text-end">{toCurrency(portfolio.returnYTD)}</td>
-            </tr>
-            <tr>
-              <td>
-                <small>(Year-to-date)</small>
-              </td>
-              <td className="text-end">
-                <small>{toPercent(portfolio.percentYTD)}</small>
-              </td>
-            </tr>
-            <tr>
-              <br />
-            </tr> */}
             <tr>
               <td>Book cost of investments</td>
-              <td className="text-end">{toCurrency(portfolio.bookCost)}</td>
+              <td className="text-end">{toCurrency(data.bookCost)}</td>
             </tr>
             <tr>
               <td className="fw-bold">Unrealized gain/loss</td>
               <td
                 className={`text-end fw-bold ${getTextColor(
-                  portfolio.unrealizedGains,
+                  data.unrealizedGains,
                 )}`}
               >
-                {toCurrency(portfolio.unrealizedGains)}
+                {toCurrency(data.unrealizedGains)}
               </td>
             </tr>
             <tr>
@@ -103,7 +85,7 @@ export default function PortfolioSummary() {
             </tr>
             <tr>
               <td>Number of holdings</td>
-              <td className="text-end">{portfolio.numHoldings}</td>
+              <td className="text-end">{data.numHoldings}</td>
             </tr>
             <tr>
               <br />
@@ -111,7 +93,7 @@ export default function PortfolioSummary() {
             <tr>
               <td className="fw-bold">Top 3 holdings</td>
             </tr>
-            {portfolio.top3Holdings.map((holding) => (
+            {data.top3Holdings.map((holding) => (
               <tr>
                 <td>{holding.name}</td>
                 <td className="text-end">{toCurrency(holding.mktVal)}</td>

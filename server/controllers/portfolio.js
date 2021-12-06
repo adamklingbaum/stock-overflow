@@ -150,9 +150,18 @@ const getSummary = async (portfolioId, date = new Date()) => {
 };
 
 module.exports = {
+  get: async (req, res) => {
+    const { portfolio_id: id } = req.params;
+    try {
+      const [rows, fields] = await portfolio.get(id);
+      res.status(201).send(rows[0]);
+    } catch (e) {
+      console.error(e);
+      res.status(500).send();
+    }
+  },
   create: async (req, res) => {
     const { name, date, cash } = req.body;
-    console.log(name, date, cash);
     try {
       const [rows] = await portfolio.create({ name, date, cash });
       res.status(201).json({ created_id: rows.insertId });

@@ -5,22 +5,21 @@ import PortfolioHolding from './PortfolioHolding';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-export default function PortfolioHoldings() {
-  let params = useParams();
+export default function PortfolioHoldings({ portfolio }) {
   const [holdings, setHoldings] = useState([]);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    axios.get(`/portfolios/${params.id}/holdings`).then(({ data }) => {
+    axios.get(`/portfolios/${portfolio.id}/holdings`).then(({ data }) => {
       setHoldings(data);
       setShow(true);
     });
-  }, [params.id]);
+  }, [portfolio.id]);
 
   return (
     <div className="my-3">
       <div className="my-3">
-        <h3>Portfolio {params.id} holdings</h3>
+        <h3>Portfolio {portfolio.name} holdings</h3>
       </div>
       <div className="my-4">
         {show ? (
