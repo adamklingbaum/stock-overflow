@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `portfolios`;
 CREATE TABLE `portfolios` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
   `name` MEDIUMTEXT NULL DEFAULT NULL,
-  `inception_date` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `inception_date` DATE NOT NULL,
   `starting_cash` INTEGER NULL DEFAULT NULL,
   `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
@@ -34,7 +34,7 @@ DROP TABLE IF EXISTS `stock_txs`;
 
 CREATE TABLE `stock_txs` (
   `id` INTEGER NOT NULL AUTO_INCREMENT,
-  `date` TIMESTAMP NULL DEFAULT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date` DATE NOT NULL,
   `type` VARCHAR(4) NULL DEFAULT NULL,
   `security_id` INTEGER NULL DEFAULT NULL,
   `units` INTEGER NULL DEFAULT NULL,
@@ -72,6 +72,17 @@ CREATE TABLE `cash_txs` (
   PRIMARY KEY (`id`)
 );
 
+DROP TABLE IF EXISTS `prices`;
+
+CREATE TABLE `prices` (
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `security_id` INTEGER NULL DEFAULT NULL,
+  `date` DATE NOT NULL,
+  `price` DOUBLE NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+
 -- ---
 -- Foreign Keys
 -- ---
@@ -79,6 +90,7 @@ CREATE TABLE `cash_txs` (
 ALTER TABLE `stock_txs` ADD FOREIGN KEY (security_id) REFERENCES `securities` (`id`);
 ALTER TABLE `stock_txs` ADD FOREIGN KEY (portfolio_id) REFERENCES `portfolios` (`id`);
 ALTER TABLE `cash_txs` ADD FOREIGN KEY (portfolio_id) REFERENCES `portfolios` (`id`);
+ALTER TABLE `prices` ADD FOREIGN KEY (security_id) REFERENCES `securities` (`id`);
 
 -- ---
 -- Table Properties

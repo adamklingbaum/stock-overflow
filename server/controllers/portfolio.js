@@ -1,19 +1,20 @@
 const { portfolio, transaction, price, security } = require('../models');
 const axios = require('axios');
-const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
 const IEX_BASE_URL = 'https://cloud.iexapis.com/stable';
 const { IEX_API_KEY } = require('../iex.config');
-const { FINNHUB_API_KEY } = require('../finnhub.config');
+// const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
+// const { FINNHUB_API_KEY } = require('../finnhub.config');
 
 const getPrice = async (securityId, date) => {
+  const dateStr = date.toISOString().split('T')[0];
   try {
-    let [rows, fields] = await price.get(securityId, date);
-    const dateString = date.split('-').join('');
+    let [rows, fields] = await price.get(securityId, dateStr);
+    const apiDateStr = dateStr.split('-').join('');
     if (rows.length === 0) {
       [rows, fields] = await security.getSymbolById(securityId);
       const symbol = rows[0].symbol;
       return axios
-        .get(`${IEX_BASE_URL}/stock/${symbol}/chart/date/${dateString}`, {
+        .get(`${IEX_BASE_URL}/stock/${symbol}/chart/date/${apiDateStr}`, {
           params: {
             token: IEX_API_KEY,
             chartByDay: true,
@@ -22,9 +23,8 @@ const getPrice = async (securityId, date) => {
         })
         .then(({ data }) => {
           if (data.length === 0) {
-            let today = new Date(date);
-            let yesterday = new Date(today.getTime() - 1000 * 60 * 60 * 24);
-            return getPrice(securityId, yesterday.toISOString().split('T')[0]);
+            let yesterday = new Date(date.getTime() - 1000 * 60 * 60 * 24);
+            return getPrice(securityId, yesterday);
           }
           const { close } = data[0];
           price.add(securityId, date, close);
@@ -41,11 +41,12 @@ const getPrice = async (securityId, date) => {
   }
 };
 
-const getHoldings = async (portfolioId, date) => {
+const getHoldings = async (portfolioId, date = new Date()) => {
+  const dateStr = date.toISOString().split('T')[0];
   try {
     const [rows, fields] = await transaction.getAllByPortfolio(
       portfolioId,
-      date,
+      dateStr,
     );
     let holdings = {};
     rows.forEach(
@@ -73,18 +74,22 @@ const getHoldings = async (portfolioId, date) => {
       (id) =>
         new Promise((resolve, reject) => {
           const holding = holdings[id];
-          getPrice(id, date).then((price) => {
-            console.log('returned from getPrice:', price);
-            holding.price = price;
-            holding.oneDay = 0.05;
-            holding.mktVal = holding.price * holding.shares;
-            holding.avgCost =
-              holding.totalPurchaseCost / holding.totalPurchaseUnits;
-            holding.totalCost = holding.avgCost * holding.shares;
-            holding.unrealizedGain = holding.mktVal - holding.totalCost;
-            holding.unrealizedPercent =
-              holding.unrealizedGain / holding.totalCost;
-            resolve(holding);
+          console.log('calling get price with', date);
+          getPrice(id, date).then((todayPrice) => {
+            let yesterday = new Date(date.getTime() - 1000 * 60 * 60 * 24);
+            console.log('calling get price with', yesterday);
+            getPrice(id, yesterday).then((yesterdayPrice) => {
+              holding.price = todayPrice;
+              holding.oneDay = todayPrice / yesterdayPrice - 1;
+              holding.mktVal = holding.price * holding.shares;
+              holding.avgCost =
+                holding.totalPurchaseCost / holding.totalPurchaseUnits;
+              holding.totalCost = holding.avgCost * holding.shares;
+              holding.unrealizedGain = holding.mktVal - holding.totalCost;
+              holding.unrealizedPercent =
+                holding.unrealizedGain / holding.totalCost;
+              resolve(holding);
+            });
           });
         }),
     );
@@ -95,7 +100,8 @@ const getHoldings = async (portfolioId, date) => {
   }
 };
 
-const getSummary = async (portfolioId, date) => {
+const getSummary = async (portfolioId, date = new Date()) => {
+  const dateStr = date.toISOString().split('T')[0];
   try {
     const holdings = await getHoldings(portfolioId, date);
     const portfolioSummary = {};
@@ -111,7 +117,7 @@ const getSummary = async (portfolioId, date) => {
     // Calculate cash
     let [rows, fields] = await portfolio.getStartingCash(portfolioId);
     const startingCash = rows[0]['starting_cash'];
-    [rows, fields] = await transaction.getAllByPortfolio(portfolioId, date);
+    [rows, fields] = await transaction.getAllByPortfolio(portfolioId, dateStr);
     portfolioSummary.cash = rows.reduce((prev, tx) => {
       if (tx.type === 'sell') return prev + tx.units * tx.price;
       else return prev - tx.units * tx.price;
@@ -196,7 +202,7 @@ module.exports = {
       while (currDate <= today) {
         currString = currDate.toISOString().split('T')[0];
         series[currString] = { date: currDate };
-        portfolioSummary = await getSummary(portfolioId, currString);
+        portfolioSummary = await getSummary(portfolioId, currDate);
         series[currString].summary = portfolioSummary;
         currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
       }
