@@ -10,4 +10,9 @@ module.exports = {
     const queryParams = [symbol];
     return db.query(queryString, queryParams);
   },
+  getSymbolById: (id) => {
+    const queryString = 'SELECT symbol FROM securities WHERE id=?';
+    const queryParams = [id];
+    return db.query(queryString, queryParams);
+  },
 };

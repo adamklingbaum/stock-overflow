@@ -22,7 +22,7 @@ module.exports = {
       FROM stock_txs JOIN securities
       ON stock_txs.security_id=securities.id
       WHERE portfolio_id=?
-      ${date ? 'AND stock_txs.date <?' : ''}`;
+      ${date ? 'AND stock_txs.date <=?' : ''}`;
     const queryParams = [portfolioId, date];
     return db.query(queryString, queryParams);
   },

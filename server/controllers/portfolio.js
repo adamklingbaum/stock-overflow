@@ -1,7 +1,45 @@
-const { portfolio, transaction } = require('../models');
+const { portfolio, transaction, price, security } = require('../models');
 const axios = require('axios');
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
-const { API_KEY } = require('../finnhub.config');
+const IEX_BASE_URL = 'https://cloud.iexapis.com/stable';
+const { IEX_API_KEY } = require('../iex.config');
+const { FINNHUB_API_KEY } = require('../finnhub.config');
+
+const getPrice = async (securityId, date) => {
+  try {
+    let [rows, fields] = await price.get(securityId, date);
+    const dateString = date.split('-').join('');
+    if (rows.length === 0) {
+      [rows, fields] = await security.getSymbolById(securityId);
+      const symbol = rows[0].symbol;
+      return axios
+        .get(`${IEX_BASE_URL}/stock/${symbol}/chart/date/${dateString}`, {
+          params: {
+            token: IEX_API_KEY,
+            chartByDay: true,
+            includeToday: true,
+          },
+        })
+        .then(({ data }) => {
+          if (data.length === 0) {
+            let today = new Date(date);
+            let yesterday = new Date(today.getTime() - 1000 * 60 * 60 * 24);
+            return getPrice(securityId, yesterday.toISOString().split('T')[0]);
+          }
+          const { close } = data[0];
+          price.add(securityId, date, close);
+          console.log('price from api:', close);
+          return close;
+        });
+    } else {
+      console.log('price from db: ', rows[0].price);
+      return rows[0].price;
+    }
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
 
 const getHoldings = async (portfolioId, date) => {
   try {
@@ -32,25 +70,22 @@ const getHoldings = async (portfolioId, date) => {
     );
 
     holdings = Object.keys(holdings).map(
-      (key) =>
+      (id) =>
         new Promise((resolve, reject) => {
-          const holding = holdings[key];
-          axios
-            .get(`${FINNHUB_BASE_URL}/quote?symbol=${holding.symbol}`, {
-              headers: { 'X-FinnHub-Token': API_KEY },
-            })
-            .then(({ data }) => {
-              holding.price = data.c;
-              holding.oneDay = data.dp / 100;
-              holding.mktVal = holding.price * holding.shares;
-              holding.avgCost =
-                holding.totalPurchaseCost / holding.totalPurchaseUnits;
-              holding.totalCost = holding.avgCost * holding.shares;
-              holding.unrealizedGain = holding.mktVal - holding.totalCost;
-              holding.unrealizedPercent =
-                holding.unrealizedGain / holding.totalCost;
-              resolve(holding);
-            });
+          const holding = holdings[id];
+          getPrice(id, date).then((price) => {
+            console.log('returned from getPrice:', price);
+            holding.price = price;
+            holding.oneDay = 0.05;
+            holding.mktVal = holding.price * holding.shares;
+            holding.avgCost =
+              holding.totalPurchaseCost / holding.totalPurchaseUnits;
+            holding.totalCost = holding.avgCost * holding.shares;
+            holding.unrealizedGain = holding.mktVal - holding.totalCost;
+            holding.unrealizedPercent =
+              holding.unrealizedGain / holding.totalCost;
+            resolve(holding);
+          });
         }),
     );
     return Promise.all(holdings);
@@ -155,17 +190,17 @@ module.exports = {
       const today = new Date();
       let start = new Date(inceptionDate);
       let currDate = start;
+      let portfolioSummary;
+      let currString;
       const series = {};
       while (currDate <= today) {
-        const currString = currDate.toISOString().split('T')[0];
-        const nextDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
-        const nextString = nextDate.toISOString().split('T')[0];
+        currString = currDate.toISOString().split('T')[0];
         series[currString] = { date: currDate };
-        const portfolioSummary = await getSummary(portfolioId, nextString);
+        portfolioSummary = await getSummary(portfolioId, currString);
         series[currString].summary = portfolioSummary;
-        currDate = new Date(currDate.getTime() + 10000 * 60 * 60 * 24);
+        currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
       }
-      console.log(series);
+      // console.log(series);
       res.status(200).send(series);
     } catch (e) {
       console.error(e);
