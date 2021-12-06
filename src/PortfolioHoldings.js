@@ -47,9 +47,11 @@ export default function PortfolioHoldings({ portfolio }) {
               </tbody>
             </Table>
           ) : (
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading</span>
-            </Spinner>
+            <div>
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading</span>
+              </Spinner>
+            </div>
           )}
           <AddTransaction portfolio={portfolio} label="Add transaction" />
         </div>

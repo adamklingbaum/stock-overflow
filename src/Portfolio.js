@@ -23,16 +23,19 @@ export default function Portfolio() {
         <small className="text-muted">My portfolios</small>
         <h2>{portfolio.name}</h2>
       </div>
-      <Nav variant="tabs">
+      <Nav variant="tabs" defaultActiveKey="link-1">
         <Nav.Item>
-          <Nav.Link active={pathname === 'overview'}>
+          <Nav.Link
+            eventKey="link-1"
+            active={pathname === 'overview' || pathname === id}
+          >
             <Link to="overview" style={{ textDecoration: 'none' }}>
               Overview
             </Link>
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
-          <Nav.Link active={pathname === 'holdings'}>
+          <Nav.Link eventKey="link-2" active={pathname === 'holdings'}>
             <Link to="holdings" style={{ textDecoration: 'none' }}>
               Holdings
             </Link>
@@ -40,6 +43,7 @@ export default function Portfolio() {
         </Nav.Item>
       </Nav>
       <Routes>
+        <Route index element={<PortfolioOverview portfolio={portfolio} />} />
         <Route
           path="overview"
           element={<PortfolioOverview portfolio={portfolio} />}
