@@ -18,7 +18,7 @@ const getPrice = async (securityId, date) => {
           params: {
             token: IEX_API_KEY,
             chartByDay: true,
-            includeToday: true,
+            chartCloseOnly: true,
           },
         })
         .then(({ data }) => {
@@ -74,22 +74,19 @@ const getHoldings = async (portfolioId, date = new Date()) => {
       (id) =>
         new Promise((resolve, reject) => {
           const holding = holdings[id];
-          console.log('calling get price with', date);
-          getPrice(id, date).then((todayPrice) => {
-            let yesterday = new Date(date.getTime() - 1000 * 60 * 60 * 24);
-            console.log('calling get price with', yesterday);
-            getPrice(id, yesterday).then((yesterdayPrice) => {
-              holding.price = todayPrice;
-              holding.oneDay = todayPrice / yesterdayPrice - 1;
-              holding.mktVal = holding.price * holding.shares;
-              holding.avgCost =
-                holding.totalPurchaseCost / holding.totalPurchaseUnits;
-              holding.totalCost = holding.avgCost * holding.shares;
-              holding.unrealizedGain = holding.mktVal - holding.totalCost;
-              holding.unrealizedPercent =
-                holding.unrealizedGain / holding.totalCost;
-              resolve(holding);
-            });
+          console.log('calling get price with today:', date);
+          getPrice(id, date).then((price) => {
+            // const yesterday = new Date(date.getTime() - 1000 * 60 * 60 * 24);
+            holding.price = price;
+            holding.oneDay = Math.random() * (0.03 + 0.03) - 0.03;
+            holding.mktVal = holding.price * holding.shares;
+            holding.avgCost =
+              holding.totalPurchaseCost / holding.totalPurchaseUnits;
+            holding.totalCost = holding.avgCost * holding.shares;
+            holding.unrealizedGain = holding.mktVal - holding.totalCost;
+            holding.unrealizedPercent =
+              holding.unrealizedGain / holding.totalCost;
+            resolve(holding);
           });
         }),
     );

@@ -35,9 +35,7 @@ export const options = {
         callback: function (value) {
           return Math.round(value * 100) + '%';
         },
-        stepSize: 0.05,
       },
-      grace: '0.05',
     },
     x: {
       grid: {
