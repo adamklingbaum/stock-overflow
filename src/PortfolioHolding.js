@@ -1,7 +1,8 @@
 import { Button } from 'react-bootstrap';
 import { toCurrency, toPercent, toNumber, getTextColor } from './utils';
+import AddTransaction from './AddTransaction';
 
-export default function PortfolioHolding({ holding }) {
+export default function PortfolioHolding({ portfolio, holding }) {
   const {
     name,
     symbol,
@@ -37,11 +38,26 @@ export default function PortfolioHolding({ holding }) {
           unrealizedPercent,
         )}`}</small>
       </td>
-      <td className="text-end">
+      {/* <td className="text-end">
         <div>{toNumber(trades)}</div>
-        <Button type="button" size="sm">
-          + Trade
-        </Button>
+      </td> */}
+      <td className="text-center">
+        <AddTransaction
+          symbol={symbol}
+          portfolio={portfolio}
+          label="Buy"
+          size="sm"
+          type="buy"
+          variant="success"
+        />{' '}
+        <AddTransaction
+          symbol={symbol}
+          portfolio={portfolio}
+          label="Sell"
+          size="sm"
+          type="sell"
+          variant="danger"
+        />
       </td>
     </tr>
   );

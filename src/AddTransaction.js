@@ -4,7 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toCurrency } from './utils';
 
-export default function AddTransaction({ portfolio }) {
+export default function AddTransaction({
+  portfolio,
+  symbol = '',
+  label,
+  size,
+  type = 'buy',
+  variant,
+}) {
   const [show, setShow] = useState(false);
   const [universe, setUniverse] = useState([]);
 
@@ -20,11 +27,11 @@ export default function AddTransaction({ portfolio }) {
   }, []);
 
   const [formData, setFormData] = useState({
-    symbol: '',
+    symbol,
     date: '',
     shares: '',
     price: '',
-    type: 'buy',
+    type,
   });
 
   const handleSubmit = (event) => {
@@ -48,8 +55,8 @@ export default function AddTransaction({ portfolio }) {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
-        Add transaction
+      <Button size={size} variant={variant || 'primary'} onClick={handleShow}>
+        {label}
       </Button>
 
       <Modal

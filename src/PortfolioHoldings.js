@@ -33,12 +33,16 @@ export default function PortfolioHoldings({ portfolio }) {
                   <th className="text-end">Average Cost</th>
                   <th className="text-end">Total Cost</th>
                   <th className="text-end">Unrealized Gain</th>
-                  <th className="text-end">Trades</th>
+                  <th className="text-center">Update</th>
+                  {/* <th className="text-end">Transaction</th> */}
                 </tr>
               </thead>
               <tbody>
                 {Object.keys(holdings).map((secId) => (
-                  <PortfolioHolding holding={holdings[secId]} />
+                  <PortfolioHolding
+                    portfolio={portfolio}
+                    holding={holdings[secId]}
+                  />
                 ))}
               </tbody>
             </Table>
@@ -47,7 +51,7 @@ export default function PortfolioHoldings({ portfolio }) {
               <span className="visually-hidden">Loading</span>
             </Spinner>
           )}
-          <AddTransaction portfolio={portfolio} />
+          <AddTransaction portfolio={portfolio} label="Add transaction" />
         </div>
       </div>
     </div>
