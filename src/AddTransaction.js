@@ -34,7 +34,8 @@ export default function AddTransaction({ portfolio }) {
       .post('/transactions', data)
       .then((response) => {
         console.log(response);
-        navigate(`/portfolio/${portfolio.id}/overview`);
+        setShow(false);
+        window.location.reload();
       })
       .catch((error) => console.log(error));
   };
