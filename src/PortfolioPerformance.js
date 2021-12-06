@@ -70,7 +70,6 @@ export default function PortfolioSummary({ portfolio }) {
       setLabels(Object.keys(data));
       setSeries(data);
       setShow(true);
-      console.log(data);
     });
   }, [portfolio.id]);
 
