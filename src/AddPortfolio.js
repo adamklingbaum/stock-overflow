@@ -1,7 +1,6 @@
 import { Button, Modal, Form, InputGroup, Row, Col } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { sp500 } from './sp500';
 import axios from 'axios';
 
 export default function AddPortfolio() {
