@@ -12,7 +12,6 @@ export default function Portfolio() {
 
   useEffect(() => {
     axios.get(`/portfolios/${id}`).then(({ data }) => {
-      console.log(data);
       setPortfolio(data);
     });
   }, [id]);
@@ -42,17 +41,19 @@ export default function Portfolio() {
           </Nav.Link>
         </Nav.Item>
       </Nav>
-      <Routes>
-        <Route index element={<PortfolioOverview portfolio={portfolio} />} />
-        <Route
-          path="overview"
-          element={<PortfolioOverview portfolio={portfolio} />}
-        />
-        <Route
-          path="holdings"
-          element={<PortfolioHoldings portfolio={portfolio} />}
-        />
-      </Routes>
+      {portfolio.id && (
+        <Routes>
+          <Route index element={<PortfolioOverview portfolio={portfolio} />} />
+          <Route
+            path="overview"
+            element={<PortfolioOverview portfolio={portfolio} />}
+          />
+          <Route
+            path="holdings"
+            element={<PortfolioHoldings portfolio={portfolio} />}
+          />
+        </Routes>
+      )}
     </div>
   );
 }
