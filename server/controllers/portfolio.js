@@ -2,8 +2,6 @@ const { portfolio, transaction, price, security } = require('../models');
 const axios = require('axios');
 const IEX_BASE_URL = 'https://cloud.iexapis.com/stable';
 const { IEX_API_KEY } = require('../iex.config');
-// const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
-// const { FINNHUB_API_KEY } = require('../finnhub.config');
 
 const getPrice = async (securityId, date) => {
   const dateStr = date.toISOString().split('T')[0];
@@ -107,7 +105,6 @@ const getSummary = async (portfolioId, date = new Date()) => {
       0,
     );
 
-    // Calculate cash
     let [rows, fields] = await portfolio.getStartingCash(portfolioId);
     const startingCash = rows[0]['starting_cash'];
     [rows, fields] = await transaction.getAllByPortfolio(portfolioId, dateStr);
@@ -116,25 +113,20 @@ const getSummary = async (portfolioId, date = new Date()) => {
       else return prev - tx.units * tx.price;
     }, startingCash);
 
-    // Calculate investments
     portfolioSummary.investments = holdings.reduce(
       (prev, holding) => prev + holding.mktVal,
       0,
     );
 
-    // Calculate market value
     portfolioSummary.totalMktVal =
       portfolioSummary.cash + portfolioSummary.investments;
 
-    // Calculate return since inception
     portfolioSummary.returnSinceInception =
       portfolioSummary.totalMktVal - startingCash;
 
-    // Calculate percent since inception
     portfolioSummary.percentSinceInception =
       portfolioSummary.returnSinceInception / startingCash;
 
-    // Calculate unrealizedGains
     portfolioSummary.unrealizedGains =
       portfolioSummary.investments - portfolioSummary.bookCost;
 

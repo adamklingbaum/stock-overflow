@@ -1,5 +1,3 @@
-// import { GraphUpArrow, GraphDownArrow } from 'react-bootstrap-icons';
-
 export const toCurrency = (val, dec = 2) =>
   new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -26,10 +24,3 @@ export const getTextColor = (a, b = 0) => {
   if (a > b) return 'text-success';
   else return 'text-warning';
 };
-/*
-export const getGraphArrow = (value) => {
-  if (value > 0) return <GraphUpArrow />;
-  if (value < 0) return <GraphDownArrow />;
-  else return '';
-};
- */

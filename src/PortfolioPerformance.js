@@ -27,8 +27,6 @@ export const options = {
   },
   scales: {
     y: {
-      /* max: 1,
-      min: -1, */
       ticks: {
         callback: function (value) {
           return Math.round(value * 100) + '%';
@@ -37,18 +35,15 @@ export const options = {
     },
     x: {
       grid: {
-        drawOnChartArea: false, // https://www.chartjs.org/docs/latest/samples/scale-options/grid.html
+        drawOnChartArea: false,
       },
       ticks: {
         maxRotation: 0,
         includeBounds: true,
-        // maxTicksLimit: 10,
       },
     },
   },
 };
-
-// https://www.chartjs.org/docs/latest/axes/labelling.html
 
 ChartJS.register(
   CategoryScale,
