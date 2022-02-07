@@ -1,4 +1,3 @@
-import { Button } from 'react-bootstrap';
 import { toCurrency, toPercent, toNumber, getTextColor } from './utils';
 import AddTransaction from './AddTransaction';
 
@@ -13,7 +12,6 @@ export default function PortfolioHolding({ portfolio, holding }) {
     totalCost,
     unrealizedGain,
     unrealizedPercent,
-    trades,
     oneDay,
   } = holding;
   return (

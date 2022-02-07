@@ -1,6 +1,5 @@
-import { Button, Modal, Form, InputGroup, Row, Col } from 'react-bootstrap';
+import { Button, Modal, Form, InputGroup } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toCurrency } from './utils';
 
@@ -17,8 +16,6 @@ export default function AddTransaction({
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('/securities').then(({ data }) => {
@@ -40,11 +37,10 @@ export default function AddTransaction({
     axios
       .post('/transactions', data)
       .then((response) => {
-        console.log(response);
         setShow(false);
         window.location.reload();
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const handleChange = (event, key) => {

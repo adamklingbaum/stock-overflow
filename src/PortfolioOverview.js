@@ -1,10 +1,7 @@
-import { useParams } from 'react-router-dom';
 import { Row, Col } from 'react-bootstrap';
 
 import PortfolioSummary from './PortfolioSummary';
 import PortfolioPerformance from './PortfolioPerformance';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
 
 export default function PortfolioOverview({ portfolio }) {
   return (

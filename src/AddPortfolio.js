@@ -33,7 +33,6 @@ export default function AddPortfolio() {
   const handleChange = (event) => {
     let newFormData = { ...formData };
     newFormData[event.target.name] = event.target.value;
-    console.log(newFormData);
     setFormData(newFormData);
   };
 
@@ -44,7 +43,6 @@ export default function AddPortfolio() {
     axios
       .post('/portfolios', { name, date, cash })
       .then(({ data }) => {
-        console.log('data back from post portfolios', data);
         portfolioId = data['created_id'];
         const promises = formData.transactions.map(
           ({ symbol, shares, price, type, date }) =>
@@ -60,10 +58,9 @@ export default function AddPortfolio() {
         return Promise.all(promises);
       })
       .then((responses) => {
-        console.log(responses);
         navigate(`/portfolio/${portfolioId}/overview`);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   const addTradeField = () => {
@@ -82,9 +79,7 @@ export default function AddPortfolio() {
 
   const updateTransaction = (event, key) => {
     const newFormData = { ...formData };
-    console.log(event.target.name, key);
     newFormData.transactions[event.target.name][key] = event.target.value;
-    console.log(newFormData);
     setFormData(newFormData);
   };
 

@@ -1,6 +1,4 @@
-import { useParams } from 'react-router-dom';
 import { Table, Spinner } from 'react-bootstrap';
-import { portfolio } from './mockPortfolio';
 import PortfolioHolding from './PortfolioHolding';
 import { useEffect, useState } from 'react';
 import axios from 'axios';

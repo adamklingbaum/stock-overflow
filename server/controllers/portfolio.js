@@ -28,11 +28,9 @@ const getPrice = async (securityId, date) => {
           }
           const { close } = data[0];
           price.add(securityId, date, close);
-          console.log('price from api:', close);
           return close;
         });
     } else {
-      console.log('price from db: ', rows[0].price);
       return rows[0].price;
     }
   } catch (e) {
@@ -74,9 +72,7 @@ const getHoldings = async (portfolioId, date = new Date()) => {
       (id) =>
         new Promise((resolve, reject) => {
           const holding = holdings[id];
-          console.log('calling get price with today:', date);
           getPrice(id, date).then((price) => {
-            // const yesterday = new Date(date.getTime() - 1000 * 60 * 60 * 24);
             holding.price = price;
             holding.oneDay = Math.random() * (0.03 + 0.03) - 0.03;
             holding.mktVal = holding.price * holding.shares;
@@ -192,12 +188,10 @@ module.exports = {
   },
   getDailyValues: async (req, res) => {
     const { portfolio_id: portfolioId } = req.params;
-    console.log(portfolioId);
     try {
       let [rows, fields] = await portfolio.get(portfolioId);
       const p = rows[0];
       const { inception_date: inceptionDate, starting_cash: startingCash } = p;
-      console.log(inceptionDate, startingCash);
 
       const today = new Date();
       let start = new Date(inceptionDate);
@@ -212,7 +206,6 @@ module.exports = {
         series[currString].summary = portfolioSummary;
         currDate = new Date(currDate.getTime() + 1000 * 60 * 60 * 24);
       }
-      // console.log(series);
       res.status(200).send(series);
     } catch (e) {
       console.error(e);

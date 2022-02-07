@@ -1,7 +1,6 @@
 import { toCurrency, toPercent, getTextColor } from './utils';
 import { Table, Spinner } from 'react-bootstrap';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './PortfolioSummary.css';
 

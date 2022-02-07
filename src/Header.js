@@ -10,9 +10,6 @@ export default function Header() {
           <Nav.Link>Stock lookup</Nav.Link>
           <Nav.Link>News</Nav.Link>
         </Nav>
-        <Navbar.Text>
-          Signed in as: <a href="#login">Adam Klingbaum</a>
-        </Navbar.Text>
       </Container>
     </Navbar>
   );
